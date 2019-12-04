@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
+        Log.d("onStart", "beginning");
+
         super.onStart();
 
         ConnectionParams connectionParams =
@@ -69,11 +71,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void connected() {}
+    private void connected() {
+        mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:37i9dQZF1DX2sUQwD7tbmL");
+
+        // Subscribe to PlayerState
+        mSpotifyAppRemote.getPlayerApi()
+                .subscribeToPlayerState()
+                .setEventCallback(playerState -> {
+                    final Track track = playerState.track;
+                    if (track != null) {
+                        Log.d("MainActivity", track.name + " by " + track.artist.name);
+                    }
+                });
+
+    }
 
     @Override
     protected void onStop() {
         super.onStop();
+        SpotifyAppRemote.disconnect(mSpotifyAppRemote);
     }
 
 }
