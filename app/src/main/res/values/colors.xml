@@ -2,6 +2,6 @@
 <resources>
     <color name="colorPrimary">#FFFFFF</color>
     <color name="colorPrimaryDark">#363534</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorAccent">#1ed761</color>
     <color name="spotifyGreen">#1ed761</color>
 </resources>
