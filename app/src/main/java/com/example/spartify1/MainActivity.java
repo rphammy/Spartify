@@ -20,7 +20,7 @@ import com.spotify.protocol.types.Track;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String CLIENT_ID = "5cf2b16f08d44fb8a6acb81bd1925738";
+    private static final String CLIENT_ID = "1b256be8537d49249f3785fd1c05012c";
     private static final String REDIRECT_URI = "http://com.example.spartify1/callback";
     private SpotifyAppRemote mSpotifyAppRemote;
 
@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
