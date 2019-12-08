@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A0A0A">
+    android:background="#000000">
 
     <EditText
         android:id="@+id/search_bar"
@@ -12,7 +12,8 @@
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:backgroundTint="@color/spotifyGreen"
-        android:hint="Search Spotify"
+        android:fontFamily="@font/montserrat"
+        android:hint="Search Spotify..."
         android:imeOptions="actionDone"
         android:inputType="text"
         android:singleLine="true"

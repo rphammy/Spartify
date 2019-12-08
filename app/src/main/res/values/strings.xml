@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Spartify1</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_queue">Queue</string>
+    <string name="title_search">Search</string>
+    <string name="queue_welcome">Welcome to Spartify!</string>
+    <string name="button_create">Create a queue</string>
+    <string name="button_join">Join a queue</string>
 </resources>
