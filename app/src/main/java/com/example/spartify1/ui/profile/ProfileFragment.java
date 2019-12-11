@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -22,7 +22,10 @@ import com.example.spartify1.Song;
 import com.example.spartify1.SongService;
 import com.example.spartify1.User;
 import com.example.spartify1.UserService;
+import com.spotify.android.appremote.api.ConnectionParams;
+import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
+import com.spotify.protocol.types.Track;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
@@ -33,8 +36,8 @@ public class ProfileFragment extends Fragment {
 
     private ProfileViewModel profileViewModel;
 
-    private static final String CLIENT_ID = "5cf2b16f08d44fb8a6acb81bd1925738";
-    private static final String REDIRECT_URI = "http://com.example.spartify1/callback";
+    private static final String CLIENT_ID = "082b2bb93cb2472f9dc9f937442f2030";
+    private static final String REDIRECT_URI = "https://com.example.spartify1caroline/callback/";
     private SpotifyAppRemote mSpotifyAppRemote;
 
 
@@ -98,20 +101,8 @@ public class ProfileFragment extends Fragment {
     }
 
 
-    private void authenticateSpotify() {
-        AuthenticationRequest.Builder builder =
-                new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
-
-        builder.setScopes(new String[]{SCOPES});
-        AuthenticationRequest request = builder.build();
-
-        AuthenticationClient.openLoginActivity(getActivity(), REQUEST_CODE, request);
-
-    }
-
-//
 //    @Override
-//    protected void onStart() {
+//    public void onStart() {
 //        Log.d("onStart", "beginning");
 //
 //        super.onStart();
@@ -122,7 +113,7 @@ public class ProfileFragment extends Fragment {
 //                .showAuthView(true)
 //                .build();
 //
-//        SpotifyAppRemote.connect(this, connectionParams,
+//        SpotifyAppRemote.connect(getActivity(), connectionParams,
 //            new Connector.ConnectionListener() {
 //
 //            @Override
@@ -135,40 +126,40 @@ public class ProfileFragment extends Fragment {
 //
 //            @Override
 //                public void onFailure(Throwable throwable) {
-//                Log.e("MainAvtivirty", throwable.getMessage(), throwable);
+//                Log.e("MainActivity", throwable.getMessage(), throwable);
 //            }
 //        });
 //    }
-//
-//
-//    private void connected() {
-//        mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:37i9dQZF1DX2sUQwD7tbmL");
-//
-//        // Subscribe to PlayerState
-//        mSpotifyAppRemote.getPlayerApi()
-//                .subscribeToPlayerState()
-//                .setEventCallback(playerState -> {
-//                    final Track track = playerState.track;
-//                    if (track != null) {
-//                        Log.d("MainActivity", track.name + " by " + track.artist.name);
-//                    }
-//                });
-//
-//    }
-//
-//
+
+
+    private void connected() {
+        mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:37i9dQZF1DX2sUQwD7tbmL");
+
+        // Subscribe to PlayerState
+        mSpotifyAppRemote.getPlayerApi()
+                .subscribeToPlayerState()
+                .setEventCallback(playerState -> {
+                    final Track track = playerState.track;
+                    if (track != null) {
+                        Log.d("MainActivity", track.name + " by " + track.artist.name);
+                    }
+                });
+
+    }
+
+
 //    @Override
-//    protected void onStop() {
+//    public void onStop() {
 //        super.onStop();
 //        SpotifyAppRemote.disconnect(mSpotifyAppRemote);
 //    }
 
-//    private void authenticateSpotify() {
-//        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
-//        builder.setScopes(new String[]{SCOPES});
-//        AuthenticationRequest request = builder.build();
-//        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
-//    }
+    private void authenticateSpotify() {
+        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
+        builder.setScopes(new String[]{SCOPES});
+        AuthenticationRequest request = builder.build();
+        AuthenticationClient.openLoginActivity(getActivity(), REQUEST_CODE, request);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
