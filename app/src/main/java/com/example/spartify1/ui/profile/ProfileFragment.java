@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.example.spartify1.MainActivity;
 import com.example.spartify1.R;
 import com.example.spartify1.Song;
 import com.example.spartify1.SongService;
@@ -30,14 +31,21 @@ import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class ProfileFragment extends Fragment {
 
     private ProfileViewModel profileViewModel;
 
-    private static final String CLIENT_ID = "082b2bb93cb2472f9dc9f937442f2030";
-    private static final String REDIRECT_URI = "https://com.example.spartify1caroline/callback/";
+    private static final String CLIENT_ID = "5cf2b16f08d44fb8a6acb81bd1925738";
+    private static final String REDIRECT_URI = "http://com.example.spartify1/callback";
     private SpotifyAppRemote mSpotifyAppRemote;
 
 
@@ -83,6 +91,36 @@ public class ProfileFragment extends Fragment {
         Log.d("song", sharedPreferences.getString("userid", "No User"));
 
         getTracks();
+
+//        OkHttpClient client = new OkHttpClient();
+//
+//        String url = "https://regres.in/api/users?page=2";
+//
+//
+//        Request request = new Request.Builder()
+//                .url(url)
+//                .build();
+//
+//        client.newCall(request).enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                if(response.isSuccessful()) {
+//                    String myResponse = response.body().string();
+//
+//                    getActivity().runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Log.d("json response",myResponse );
+//                        }
+//                    });
+//                }
+//            }
+//        });
         return root;
     }
 
@@ -100,38 +138,6 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-
-//    @Override
-//    public void onStart() {
-//        Log.d("onStart", "beginning");
-//
-//        super.onStart();
-//
-//        ConnectionParams connectionParams =
-//                new ConnectionParams.Builder(CLIENT_ID)
-//                .setRedirectUri(REDIRECT_URI)
-//                .showAuthView(true)
-//                .build();
-//
-//        SpotifyAppRemote.connect(getActivity(), connectionParams,
-//            new Connector.ConnectionListener() {
-//
-//            @Override
-//            public void onConnected(SpotifyAppRemote spotifyAppRemote) {
-//                mSpotifyAppRemote = spotifyAppRemote;
-//                Log.d("MainActivity", "connected :)");
-//
-//                connected();
-//            }
-//
-//            @Override
-//                public void onFailure(Throwable throwable) {
-//                Log.e("MainActivity", throwable.getMessage(), throwable);
-//            }
-//        });
-//    }
-
-
     private void connected() {
         mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:37i9dQZF1DX2sUQwD7tbmL");
 
@@ -146,13 +152,6 @@ public class ProfileFragment extends Fragment {
                 });
 
     }
-
-
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        SpotifyAppRemote.disconnect(mSpotifyAppRemote);
-//    }
 
     private void authenticateSpotify() {
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);

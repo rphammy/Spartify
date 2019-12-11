@@ -2,6 +2,7 @@ package com.example.spartify1;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -39,10 +40,12 @@ public class SongService {
                 (Request.Method.GET, endpoint, null, response -> {
                     Gson gson = new Gson();
                     JSONArray jsonArray = response.optJSONArray("items");
+
                     for (int n = 0; n < jsonArray.length(); n++) {
                         try {
                             JSONObject object = jsonArray.getJSONObject(n);
                             object = object.optJSONObject("track");
+                            Log.d("jsom", object.toString(4));
                             Song song = gson.fromJson(object.toString(), Song.class);
                             songs.add(song);
                         } catch (JSONException e) {
@@ -54,6 +57,51 @@ public class SongService {
                     // TODO: Handle error
 
                 }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                String token = sharedPreferences.getString("token", "");
+                String auth = "Bearer " + token;
+                headers.put("Authorization", auth);
+                return headers;
+            }
+        };
+        queue.add(jsonObjectRequest);
+        return songs;
+    }
+
+    public ArrayList<Song> getSearch(final VolleyCallBack callBack) {
+        String endpoint = "https://api.spotify.com/v1/search?q=tania*&type=tracks";
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, endpoint, null, response -> {
+                    Gson gson = new Gson();
+                    try {
+                        JSONObject artists = response.optJSONObject("tracks");
+                        JSONArray jsonArray = artists.optJSONArray("items");
+                        Log.d("json", jsonArray.toString(4));
+
+                        for (int n = 0; n < jsonArray.length(); n++) {
+                            try {
+                                JSONObject object = jsonArray.getJSONObject(n);
+                                Song song = gson.fromJson(object.toString(), Song.class);
+                                songs.add(song);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    catch (JSONException e){
+                        Log.d("error", e.toString());
+                    }
+
+                    callBack.onSuccess();
+                }, error -> {
+                    // TODO: Handle error
+
+                }) {
+
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();

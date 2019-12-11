@@ -34,9 +34,8 @@ public class UserService {
             Gson gson = new Gson();
             user = gson.fromJson(response.toString(), User.class);
             callBack.onSuccess();
-        }, error -> get(() -> {
-
-        })) {
+        }, error -> get(() -> {}))
+        {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();

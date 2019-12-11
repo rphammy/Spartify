@@ -14,6 +14,8 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.spartify1.R;
 
+import kaaes.spotify.webapi.android.SpotifyApi;
+
 public class SearchFragment extends Fragment {
 
     private SearchViewModel searchViewModel;
@@ -23,6 +25,8 @@ public class SearchFragment extends Fragment {
         searchViewModel =
                 ViewModelProviders.of(this).get(SearchViewModel.class);
         View root = inflater.inflate(R.layout.fragment_search, container, false);
+
+
         return root;
     }
 }
