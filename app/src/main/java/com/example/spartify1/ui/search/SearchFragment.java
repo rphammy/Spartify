@@ -30,7 +30,6 @@ public class SearchFragment extends Fragment {
 
     private SongService songService;
     private ArrayList<Song> searchedTracks;
-    private String queryString = "";
     private ListView listView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -38,21 +37,22 @@ public class SearchFragment extends Fragment {
         searchViewModel =
                 ViewModelProviders.of(this).get(SearchViewModel.class);
         View root = inflater.inflate(R.layout.fragment_search, container, false);
-        songService = new SongService(getActivity().getApplicationContext());
-
-        search(this.queryString);
 
         listView = root.findViewById(R.id.results);
+        Button searchButton = root.findViewById(R.id.search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText searchBar = root.findViewById(R.id.search_bar);
+                search(searchBar.getText().toString());
+            }
+        });
 
         return root;
     }
 
-    public void getSearchText(View view, String searchString){
-        Button searchButton = (Button) view;
-        this.queryString = searchButton.getText().toString();
-    }
-
     private void search( String query) {
+        songService = new SongService(getActivity().getApplicationContext());
         songService.getSearch(() -> {
             searchedTracks = songService.getSongs();
 
