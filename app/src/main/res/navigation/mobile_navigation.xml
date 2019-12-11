@@ -3,23 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_profile">
 
     <fragment
-        android:id="@+id/navigation_home"
+        android:id="@+id/navigation_profile"
         android:name="com.example.spartify1.ui.profile.ProfileFragment"
-        android:label="@string/title_home"
+        android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_queue"
         android:name="com.example.spartify1.ui.queue.QueueFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_queue" />
+        android:label="@string/title_queue"
+        tools:layout="@layout/fragment_queue_welcome" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_search"
         android:name="com.example.spartify1.ui.search.SearchFragment"
-        android:label="@string/title_notifications"
+        android:label="@string/title_search"
         tools:layout="@layout/fragment_search" />
 </navigation>

@@ -22,7 +22,7 @@ public class QueueFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         queueViewModel =
                 ViewModelProviders.of(this).get(QueueViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_queue, container, false);
+        View root = inflater.inflate(R.layout.fragment_queue_welcome, container, false);
         final TextView textView = root.findViewById(R.id.text_queue);
         queueViewModel.getText().observe(this, new Observer<String>() {
             @Override
