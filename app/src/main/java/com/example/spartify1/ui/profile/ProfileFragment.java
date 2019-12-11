@@ -34,12 +34,6 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
 public class ProfileFragment extends Fragment {
 
     private ProfileViewModel profileViewModel;

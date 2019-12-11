@@ -12,6 +12,7 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/mybutton"
         android:fontFamily="@font/montserrat"
+        android:onClick="getSearchText"
         android:text="Search"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"

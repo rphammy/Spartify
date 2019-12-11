@@ -72,6 +72,9 @@ public class SongService {
     }
 
     public ArrayList<Song> getSearch(final VolleyCallBack callBack, String query) {
+
+        if (query.equals("")) return new ArrayList<>();
+
         String endpoint = "https://api.spotify.com/v1/search?q=" + query + "&type=track";
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
