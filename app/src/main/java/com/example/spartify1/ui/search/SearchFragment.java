@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -26,17 +27,23 @@ public class SearchFragment extends Fragment {
 
     private SongService songService;
     private ArrayList<Song> searchedTracks;
+    private String queryString = "";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         searchViewModel =
                 ViewModelProviders.of(this).get(SearchViewModel.class);
         View root = inflater.inflate(R.layout.fragment_search, container, false);
-
         songService = new SongService(getActivity().getApplicationContext());
-        search("abba");
+
+        search(this.queryString);
 
         return root;
+    }
+
+    public void getSearchText(View view, String searchString){
+        Button searchButton = (Button) view;
+        this.queryString = searchButton.getText().toString();
     }
 
     private void search( String query) {
