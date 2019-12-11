@@ -56,10 +56,6 @@ public class SearchFragment extends Fragment {
         songService.getSearch(() -> {
             searchedTracks = songService.getSongs();
 
-            List<String> your_array_list = new ArrayList<String>();
-            your_array_list.add("foo");
-            your_array_list.add("bar");
-
             ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, searchedTracks);
             listView.setAdapter(arrayAdapter);
         }, query);

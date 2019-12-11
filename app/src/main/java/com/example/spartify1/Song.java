@@ -37,7 +37,13 @@ public class Song {
     public void setUri(String uri) {
         this.uri = uri;
     }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 //
+
 //    public String getArtist() {
 //        return artist;
 //    }
