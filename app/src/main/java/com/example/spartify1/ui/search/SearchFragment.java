@@ -28,8 +28,6 @@ public class SearchFragment extends Fragment {
 
     private SearchViewModel searchViewModel;
 
-    private SongService songService;
-    private ArrayList<Song> searchedTracks;
     private ListView listView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -52,10 +50,8 @@ public class SearchFragment extends Fragment {
     }
 
     private void search( String query) {
-        songService = new SongService(getActivity().getApplicationContext());
-        songService.getSearch(() -> {
-            searchedTracks = songService.getSongs();
-
+        SongService songService = new SongService(getActivity().getApplicationContext());
+        songService.getSearch(() -> { ArrayList<Song> searchedTracks = songService.getSongs();
             ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, searchedTracks);
             listView.setAdapter(arrayAdapter);
         }, query);
