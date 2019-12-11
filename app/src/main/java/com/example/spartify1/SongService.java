@@ -71,8 +71,9 @@ public class SongService {
         return songs;
     }
 
-    public ArrayList<Song> getSearch(final VolleyCallBack callBack) {
-        String endpoint = "https://api.spotify.com/v1/search?q=tania*&type=tracks";
+    public ArrayList<Song> getSearch(final VolleyCallBack callBack, String query) {
+        String endpoint = "https://api.spotify.com/v1/search?q=" + query + "&type=track";
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, endpoint, null, response -> {
                     Gson gson = new Gson();
