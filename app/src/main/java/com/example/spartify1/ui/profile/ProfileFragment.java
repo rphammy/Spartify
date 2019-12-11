@@ -40,7 +40,6 @@ public class ProfileFragment extends Fragment {
 
     private static final String CLIENT_ID = "082b2bb93cb2472f9dc9f937442f2030";
     private static final String REDIRECT_URI = "https://com.example.spartify1caroline/callback/";
-    //private SpotifyAppRemote mSpotifyAppRemote;
 
 
     private static final int REQUEST_CODE = 1337;
@@ -167,9 +166,7 @@ public class ProfileFragment extends Fragment {
             name.setText(user.display_name);
             username.setText(user.id);
             ImageView profilePic = view.findViewById(R.id.picture_profile);
-            Log.d("PIC", "TEST");
             if(user.images.length > 0) {
-                Log.d("PIC", "WORK");
                 new DownloadImageTask(profilePic).execute(user.images[0].url);
             }
             else {
