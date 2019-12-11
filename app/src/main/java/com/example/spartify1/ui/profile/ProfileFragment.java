@@ -2,11 +2,15 @@ package com.example.spartify1.ui.profile;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,30 +21,26 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.example.spartify1.MainActivity;
 import com.example.spartify1.R;
 import com.example.spartify1.Song;
 import com.example.spartify1.SongService;
 import com.example.spartify1.User;
 import com.example.spartify1.UserService;
-import com.spotify.android.appremote.api.ConnectionParams;
-import com.spotify.android.appremote.api.Connector;
 import com.spotify.android.appremote.api.SpotifyAppRemote;
-import com.spotify.protocol.types.Track;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class ProfileFragment extends Fragment {
 
     private ProfileViewModel profileViewModel;
 
-    private static final String CLIENT_ID = "5cf2b16f08d44fb8a6acb81bd1925738";
-    private static final String REDIRECT_URI = "http://com.example.spartify1/callback";
-    private SpotifyAppRemote mSpotifyAppRemote;
+    private static final String CLIENT_ID = "082b2bb93cb2472f9dc9f937442f2030";
+    private static final String REDIRECT_URI = "https://com.example.spartify1caroline/callback/";
+    //private SpotifyAppRemote mSpotifyAppRemote;
 
 
     private static final int REQUEST_CODE = 1337;
@@ -63,7 +63,7 @@ public class ProfileFragment extends Fragment {
         profileViewModel =
                 ViewModelProviders.of(this).get(ProfileViewModel.class);
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
-        final TextView textView = root.findViewById(R.id.text_profile);
+        final TextView textView = root.findViewById(R.id.text_name);
         profileViewModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
@@ -84,7 +84,8 @@ public class ProfileFragment extends Fragment {
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences("SPOTIFY", 0);
         Log.d("song", sharedPreferences.getString("userid", "No User"));
 
-//        getTracks();
+        getTracks();
+        displayUserData(root);
         return root;
     }
 
@@ -100,21 +101,6 @@ public class ProfileFragment extends Fragment {
             Log.d("recently played track", recentlyPlayedTracks.get(0).getName());
             song = recentlyPlayedTracks.get(0);
         }
-    }
-
-    private void connected() {
-        mSpotifyAppRemote.getPlayerApi().play("spotify:playlist:37i9dQZF1DX2sUQwD7tbmL");
-
-        // Subscribe to PlayerState
-        mSpotifyAppRemote.getPlayerApi()
-                .subscribeToPlayerState()
-                .setEventCallback(playerState -> {
-                    final Track track = playerState.track;
-                    if (track != null) {
-                        Log.d("MainActivity", track.name + " by " + track.artist.name);
-                    }
-                });
-
     }
 
     private void authenticateSpotify() {
@@ -170,9 +156,53 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-//    private void startMainActivity() {
-//        Intent newintent = new Intent(MainActivity.this, MainActivity.class);
-//        startActivity(newintent);
-//    }
+    private void displayUserData(View view) {
+        UserService userService = new UserService(queue, msharedPreferences);
+        userService.get(() -> {
+            User user = userService.getUser();
+
+            TextView username = view.findViewById(R.id.text_username);
+            TextView name = view.findViewById(R.id.text_name);
+
+            name.setText(user.display_name);
+            username.setText(user.id);
+            ImageView profilePic = view.findViewById(R.id.picture_profile);
+            Log.d("PIC", "TEST");
+            if(user.images.length > 0) {
+                Log.d("PIC", "WORK");
+                new DownloadImageTask(profilePic).execute(user.images[0].url);
+            }
+            else {
+                profilePic.setImageResource(R.drawable.default_profile);
+            }
+
+
+        });
+    }
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
+    }
 
 }
