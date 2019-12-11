@@ -6,7 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -20,6 +22,7 @@ import com.example.spartify1.Song;
 import com.example.spartify1.SongService;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SearchFragment extends Fragment {
 
@@ -28,6 +31,7 @@ public class SearchFragment extends Fragment {
     private SongService songService;
     private ArrayList<Song> searchedTracks;
     private String queryString = "";
+    private ListView listView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -37,6 +41,8 @@ public class SearchFragment extends Fragment {
         songService = new SongService(getActivity().getApplicationContext());
 
         search(this.queryString);
+
+        listView = root.findViewById(R.id.results);
 
         return root;
     }
@@ -50,9 +56,12 @@ public class SearchFragment extends Fragment {
         songService.getSearch(() -> {
             searchedTracks = songService.getSongs();
 
-            for (int i =0; i < searchedTracks.size(); i++){
-                Log.d("searched tracks" , searchedTracks.get(i).getName());
-            }
+            List<String> your_array_list = new ArrayList<String>();
+            your_array_list.add("foo");
+            your_array_list.add("bar");
+
+            ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, searchedTracks);
+            listView.setAdapter(arrayAdapter);
         }, query);
     }
 }
