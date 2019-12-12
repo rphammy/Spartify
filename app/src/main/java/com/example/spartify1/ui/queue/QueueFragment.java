@@ -76,8 +76,7 @@ public class QueueFragment extends Fragment {
         EditText editText;
         msharedPreferences = getContext().getSharedPreferences("SPOTIFY", 0);
         editor = getActivity().getSharedPreferences("SPOTIFY", 0).edit();
-        editor.putBoolean("activeQueue", false);
-        activeQueue = msharedPreferences.getBoolean("activeQueue", false);
+        activeQueue = msharedPreferences.getBoolean("activeQueue", true);
 
 
         if(activeQueue) { //load saved state
@@ -138,10 +137,12 @@ public class QueueFragment extends Fragment {
                     Log.d("GOT PARTY CODE", partyCode);
                     // We use commit instead of apply because we need the information stored immediately
                     editor.commit();
-                    hostButton.setVisibility(View.GONE);
-                    joinButton.setVisibility(View.GONE);
-                    textView.setText("Party code: " + partyCode);
-                    backButton.setVisibility(View.VISIBLE);
+                    QueueFragment fragment = new QueueFragment();
+                    getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
+                    //hostButton.setVisibility(View.GONE);
+                    //joinButton.setVisibility(View.GONE);
+                    //textView.setText("Party code: " + partyCode);
+                    //backButton.setVisibility(View.VISIBLE);
                 }
             });
 
@@ -158,6 +159,7 @@ public class QueueFragment extends Fragment {
                     textView.setText("Party code: " + partyCode);
                     textView.setVisibility(View.VISIBLE);
                     editor.putBoolean("activeQueue", true);
+                    editor.commit();
 
                 }
             };
@@ -166,7 +168,6 @@ public class QueueFragment extends Fragment {
             joinButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //when play is clicked show stop button and hide play button
                     textView.setText("Enter party code: ");
                     hostButton.setVisibility(View.GONE);
                     joinButton.setVisibility(View.GONE);
@@ -262,9 +263,6 @@ public class QueueFragment extends Fragment {
 
         getSpotifyAppRemote();
 
-
-
-
         //add or remove when data is changed
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
@@ -288,6 +286,7 @@ public class QueueFragment extends Fragment {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
                 Song song = dataSnapshot.getValue(Song.class);
                 songQueue.remove(song);
                     if(getActivity() != null) {
