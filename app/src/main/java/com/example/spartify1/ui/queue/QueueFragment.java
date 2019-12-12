@@ -1,5 +1,6 @@
 package com.example.spartify1.ui.queue;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -56,22 +57,21 @@ public class QueueFragment extends Fragment {
     private RequestQueue queue;
     private boolean activeQueue;
 
-    ArrayList<Song> songQueue;
-
     private SpotifyAppRemote mSpotifyAppRemote;
+    ArrayList<Song> songQueue = songQueue = new ArrayList<>();
 
 
     DatabaseReference ref;
 
     private View root;
     Button backButton;
+    Context mContext;
 
     private TextView textView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        songQueue = new ArrayList<>();
         TextView textView;
         EditText editText;
         msharedPreferences = getContext().getSharedPreferences("SPOTIFY", 0);
@@ -194,85 +194,6 @@ public class QueueFragment extends Fragment {
 
         }
 
-        listView = root.findViewById(R.id.queueList);
-        ref = FirebaseDatabase.getInstance().getReference();
-
-        getSpotifyAppRemote();
-
-
-        songQueue = new ArrayList<>();
-
-
-        //add or remove when data is changed
-        ChildEventListener childEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    Song song = ds.getValue(Song.class);
-                    songQueue.add(song);
-                }
-
-                Log.d("songqueue", songQueue.toString());
-                ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
-                if (listView != null) listView.setAdapter(arrayAdapter);
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    Song song = ds.getValue(Song.class);
-                    songQueue.remove(song);
-                    ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
-                    listView.setAdapter(arrayAdapter);
-
-                    //refresh
-                    Fragment fragment = null;
-                    fragment = getFragmentManager().findFragmentById(R.id.navigation_queue);
-                    final FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.detach(fragment);
-                    ft.attach(fragment);
-                    ft.commit();
-
-                }
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
-        ref.child("parties").addChildEventListener(childEventListener);
-
-        //when you click a song
-     if (listView != null) {
-          listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-              @Override
-              public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                  Song song = songQueue.get(position);
-
-                  boolean host = msharedPreferences.getBoolean("host", false);
-
-                  if(host) {
-                      Toast.makeText(getActivity().getBaseContext(), "Playing " + song.toString(), Toast.LENGTH_LONG).show();
-                      playSong(song);
-                      removeSong(song);
-                  }
-              }
-          });
-       }
-
-
-
         return root;
     }
 
@@ -327,5 +248,90 @@ public class QueueFragment extends Fragment {
                         // Something went wrong when attempting to connect! Handle errors here
                     }
                 });
+    }
+
+    @Override
+    public void onActivityCreated(Bundle bundle) {
+        super.onActivityCreated(bundle);
+        listView = root.findViewById(R.id.queueList);
+        ref = FirebaseDatabase.getInstance().getReference();
+
+        getSpotifyAppRemote();
+
+
+
+
+        //add or remove when data is changed
+        ChildEventListener childEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                songQueue.clear();
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Song song = ds.getValue(Song.class);
+                    songQueue.add(song);
+                }
+
+                Log.d("songqueue", songQueue.toString());
+                if(getActivity() != null) {
+                    ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
+                    if (listView != null) listView.setAdapter(arrayAdapter);
+
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                songQueue = songQueue = new ArrayList<>();
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Song song = ds.getValue(Song.class);
+                    songQueue.remove(song);
+                    if(getActivity() != null) {
+                        Log.d("song", "removed");
+                        ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
+                        listView.setAdapter(arrayAdapter);
+                    }
+
+                    //refresh
+                    QueueFragment fragment = new QueueFragment();
+                    getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
+
+                }
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        ref.child("parties").addChildEventListener(childEventListener);
+
+        //when you click a song
+        if (listView != null) {
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Song song = songQueue.get(position);
+
+                    boolean host = msharedPreferences.getBoolean("host", false);
+
+                    if(host) {
+                        Toast.makeText(getActivity().getBaseContext(), "Playing " + song.toString(), Toast.LENGTH_LONG).show();
+                        playSong(song);
+                        removeSong(song);
+                    }
+                }
+            });
+        }
+
     }
 }
