@@ -75,7 +75,7 @@ public class QueueFragment extends Fragment {
         EditText editText;
         msharedPreferences = getContext().getSharedPreferences("SPOTIFY", 0);
         editor = getActivity().getSharedPreferences("SPOTIFY", 0).edit();
-        activeQueue = msharedPreferences.getBoolean("activeQueue", true);
+        activeQueue = msharedPreferences.getBoolean("activeQueue", false);
 
         if(activeQueue) { //load saved state
             root = inflater.inflate(R.layout.fragment_queue_display, container, false);
