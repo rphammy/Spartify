@@ -155,9 +155,13 @@ public class QueueFragment extends Fragment {
                     textView.setText("Party code: " + partyCode);
                     textView.setVisibility(View.VISIBLE);
 
+
+                    //listview updated here
+
                 }
             };
             queueViewModel.getText().observe(this, observer);
+
 
             joinButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -260,18 +264,13 @@ public class QueueFragment extends Fragment {
 
 
 
-
         //add or remove when data is changed
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                songQueue.clear();
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    Song song = ds.getValue(Song.class);
-                    songQueue.add(song);
-                }
+                Song song = dataSnapshot.getValue(Song.class);
+                songQueue.add(song);
 
-                Log.d("songqueue", songQueue.toString());
                 if(getActivity() != null) {
                     ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
                     if (listView != null) listView.setAdapter(arrayAdapter);
@@ -286,9 +285,9 @@ public class QueueFragment extends Fragment {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                songQueue = songQueue = new ArrayList<>();
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    Song song = ds.getValue(Song.class);
+                songQueue = new ArrayList<>();
+
+                    Song song = dataSnapshot.getValue(Song.class);
                     songQueue.remove(song);
                     if(getActivity() != null) {
                         Log.d("song", "removed");
@@ -300,7 +299,6 @@ public class QueueFragment extends Fragment {
                     QueueFragment fragment = new QueueFragment();
                     getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
 
-                }
             }
 
             @Override
@@ -313,7 +311,7 @@ public class QueueFragment extends Fragment {
 
             }
         };
-        ref.child("parties").addChildEventListener(childEventListener);
+        ref.child("parties").child("-PARTY_ID_" + partyCode).addChildEventListener(childEventListener);
 
         //when you click a song
         if (listView != null) {
