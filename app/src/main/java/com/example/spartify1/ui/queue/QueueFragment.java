@@ -123,7 +123,7 @@ public class QueueFragment extends Fragment {
 
                 Log.d("songqueue", songQueue.toString());
                 ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
-                listView.setAdapter(arrayAdapter);
+                if (listView != null) listView.setAdapter(arrayAdapter);
             }
 
             @Override
@@ -147,16 +147,18 @@ public class QueueFragment extends Fragment {
             }
         };
         ref.child("parties").addChildEventListener(childEventListener);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Song song = songQueue.get(position);
-                Toast.makeText(getActivity().getBaseContext(), "Playing " + song.toString(), Toast.LENGTH_LONG).show();
-            }
-        });
+        if (listView != null) {
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Song song = songQueue.get(position);
+                    Toast.makeText(getActivity().getBaseContext(), "Playing " + song.toString(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
 
 
         return root;
     }
+
 }

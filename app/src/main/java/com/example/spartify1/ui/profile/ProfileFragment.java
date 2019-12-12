@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -39,8 +42,8 @@ public class ProfileFragment extends Fragment {
 
     private ProfileViewModel profileViewModel;
 
-    private static final String CLIENT_ID = "5cf2b16f08d44fb8a6acb81bd1925738";
-    private static final String REDIRECT_URI = "http://com.example.spartify1/callback";
+    private static final String CLIENT_ID = "1b256be8537d49249f3785fd1c05012c";
+    private static final String REDIRECT_URI = "http://com.example.spartify/kyle/callback/";
 
 
     private static final int REQUEST_CODE = 1337;
@@ -56,13 +59,14 @@ public class ProfileFragment extends Fragment {
     private UserService userService = null;
     private SongService songService;
     private ArrayList<Song> recentlyPlayedTracks;
+    private View root;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         profileViewModel =
                 ViewModelProviders.of(this).get(ProfileViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_profile, container, false);
+        root = inflater.inflate(R.layout.fragment_profile, container, false);
         final TextView textView = root.findViewById(R.id.text_name);
         profileViewModel.getText().observe(this, new Observer<String>() {
             @Override
@@ -70,7 +74,6 @@ public class ProfileFragment extends Fragment {
                 textView.setText(s);
             }
         });
-
         Button connectButton = root.findViewById(R.id.connect_button);
         connectButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +81,8 @@ public class ProfileFragment extends Fragment {
                 authenticateSpotify();
                 displayUserData(root);
                 v.setVisibility(View.GONE);
+                ProfileFragment fragment = new ProfileFragment();
+                getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
             }
         });
         if (this.userService != null) displayUserData(root);
@@ -88,26 +93,11 @@ public class ProfileFragment extends Fragment {
         Log.d("song", sharedPreferences.getString("userid", "No User"));
         if (msharedPreferences.getBoolean("ConnectionFlag", false) == true) {
             displayUserData((root));
-            Button connectionButton = root.findViewById(R.id.connect_button);
-            connectionButton.setVisibility(View.GONE);
+            connectButton.setVisibility(View.GONE);
+
         }
-        //        getTracks();
         return root;
     }
-
-//    private void getTracks() {
-//        songService.getRecentlyPlayedTracks(() -> {
-//            recentlyPlayedTracks = songService.getSongs();
-//            updateSong();
-//        });
-//    }
-
-//    private void updateSong() {
-//        if (recentlyPlayedTracks.size() > 0) {
-//            Log.d("recently played track", recentlyPlayedTracks.get(0).getName());
-//            song = recentlyPlayedTracks.get(0);
-//        }
-//    }
 
     private void authenticateSpotify() {
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
@@ -130,7 +120,6 @@ public class ProfileFragment extends Fragment {
                     editor = getActivity().getSharedPreferences("SPOTIFY", 0).edit();
                     editor.putString("token", response.getAccessToken());
                     Log.d( "GOT AUTH TOKEN", response.getAccessToken());
-                    editor.putBoolean("ConnectionFlag", true);
 
                     editor.apply();
                     waitForUserInfo();
@@ -145,6 +134,7 @@ public class ProfileFragment extends Fragment {
                 default:
                     // Handle other cases
             }
+            displayUserData(root);
         }
     }
 
@@ -159,8 +149,8 @@ public class ProfileFragment extends Fragment {
             if(user.images.length > 0) {
                 editor.putString("profile_pic_url", user.images[0].url);
             }
-
             Log.d("GOT USER INFORMATION", user.id);
+            editor.putBoolean("ConnectionFlag", true);
             // We use commit instead of apply because we need the information stored immediately
             editor.commit();
 //            startMainActivity();
@@ -168,23 +158,20 @@ public class ProfileFragment extends Fragment {
     }
 
     private void displayUserData(View view) {
-//        this.userService = new UserService(queue, msharedPreferences);
-//        this.userService.get(() -> {
-//            User user = this.userService.getUser();
-            SharedPreferences sharedPreferences = getContext().getSharedPreferences("SPOTIFY", 0);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("SPOTIFY", 0);
 
-            TextView username = view.findViewById(R.id.text_username);
-            TextView name = view.findViewById(R.id.text_name);
+        TextView username = view.findViewById(R.id.text_username);
+        TextView name = view.findViewById(R.id.text_name);
 
-            name.setText(sharedPreferences.getString("display_name", "user"));
-            username.setText(sharedPreferences.getString("userid", "user"));
-            ImageView profilePic = view.findViewById(R.id.picture_profile);
-            if(sharedPreferences.getString("profile_pic_url", "def").equals("def")) {
-                profilePic.setImageResource(R.drawable.default_profile);
-            }
-            else {
-                new DownloadImageTask(profilePic).execute(sharedPreferences.getString("profile_pic_url", "def"));
-            }
+        name.setText(sharedPreferences.getString("display_name", "Display Name"));
+        username.setText(sharedPreferences.getString("userid", "User ID"));
+        ImageView profilePic = view.findViewById(R.id.picture_profile);
+        if(sharedPreferences.getString("profile_pic_url", "def").equals("def")) {
+            profilePic.setImageResource(R.drawable.default_profile);
+        }
+        else {
+            new DownloadImageTask(profilePic).execute(sharedPreferences.getString("profile_pic_url", "def"));
+        }
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
