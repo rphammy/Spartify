@@ -43,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = this.getSharedPreferences("SPOTIFY", 0).edit();
         editor.putBoolean("activeQueue", true);
 
-        getSpotifyAppRemote();
-
     }
 
     @Override
@@ -57,25 +55,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void getSpotifyAppRemote() {
-        ConnectionParams connectionParams =
-                new ConnectionParams.Builder(ProfileFragment.CLIENT_ID)
-                        .setRedirectUri(ProfileFragment.REDIRECT_URI)
-                        .showAuthView(true)
-                        .build();
-
-        SpotifyAppRemote.connect(this, connectionParams,
-                new Connector.ConnectionListener() {
-
-                    public void onConnected(SpotifyAppRemote spotifyAppRemote) {
-                        mSpotifyAppRemote = spotifyAppRemote;
-                        Log.d("MainActivity", "Connected! Yay!");
-                    }
-
-                    public void onFailure(Throwable throwable) {
-                        Log.e("MyActivity", throwable.getMessage(), throwable);
-                        // Something went wrong when attempting to connect! Handle errors here
-                    }
-                });
-    }
 }
