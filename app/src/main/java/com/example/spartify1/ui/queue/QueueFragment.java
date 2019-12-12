@@ -6,10 +6,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
@@ -48,7 +50,7 @@ public class QueueFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
+        songQueue = new ArrayList<>();
         View root;
         TextView textView;
         msharedPreferences = getContext().getSharedPreferences("SPOTIFY", 0);
@@ -146,6 +148,13 @@ public class QueueFragment extends Fragment {
         };
         ref.child("parties").addChildEventListener(childEventListener);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Song song = songQueue.get(position);
+                Toast.makeText(getActivity().getBaseContext(), "Playing " + song.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
 
 
         return root;
