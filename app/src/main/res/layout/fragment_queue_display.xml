@@ -26,7 +26,7 @@
         app:layout_constraintGuide_percent="0.15" />
 
     <ListView
-        android:id="@+id/listView2"
+        android:id="@+id/queueList"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:background="#00000000"

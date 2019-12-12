@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -19,6 +20,16 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 import com.android.volley.RequestQueue;
 import com.example.spartify1.R;
+import com.example.spartify1.Song;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class QueueFragment extends Fragment {
 
@@ -30,6 +41,10 @@ public class QueueFragment extends Fragment {
 
     private RequestQueue queue;
     private boolean activeQueue;
+
+    ArrayList<Song> songQueue;
+
+    DatabaseReference ref;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -51,6 +66,7 @@ public class QueueFragment extends Fragment {
             textView = root.findViewById(R.id.text_queue);
             Button joinButton = root.findViewById(R.id.button);
             Button hostButton = root.findViewById(R.id.button2);
+
             //host a party
             partyCode = RandomStringUtils.randomAlphanumeric(7);
             hostButton.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +105,48 @@ public class QueueFragment extends Fragment {
             });
 
         }
+
+        listView = root.findViewById(R.id.queueList);
+        ref = FirebaseDatabase.getInstance().getReference();
+
+        songQueue = new ArrayList<>();
+        //add or remove when data is changed
+        ChildEventListener childEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Song song = ds.getValue(Song.class);
+                    songQueue.add(song);
+                }
+
+                Log.d("songqueue", songQueue.toString());
+                ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
+                listView.setAdapter(arrayAdapter);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        ref.child("parties").addChildEventListener(childEventListener);
+
+
 
         return root;
     }

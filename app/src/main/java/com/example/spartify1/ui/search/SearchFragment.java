@@ -1,5 +1,6 @@
 package com.example.spartify1.ui.search;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,15 +37,19 @@ public class SearchFragment extends Fragment {
 
     private SearchViewModel searchViewModel;
     private DatabaseReference ref;
-    private int partyID;
+    private String partyID;
 
     private ListView listView;
     ArrayList<Song> searchedTracks;
+    private SharedPreferences msharedPreferences;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        msharedPreferences = getContext().getSharedPreferences("SPOTIFY", 0);
+        partyID = msharedPreferences.getString("partyCode", "");
+
         ref = FirebaseDatabase.getInstance().getReference();
-        partyID = 0;
 
         searchViewModel = ViewModelProviders.of(this).get(SearchViewModel.class);
         View root = inflater.inflate(R.layout.fragment_search, container, false);
@@ -84,7 +89,7 @@ public class SearchFragment extends Fragment {
 
     private void addSongToQueue(Song song){
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("title", song.getName());
+        dataMap.put("title", song.getTitle());
         dataMap.put("artist", song.getArtist());
         dataMap.put("uri", song.getUri());
         ref.child("parties").child("-PARTY_ID_" + partyID).push().updateChildren(dataMap);

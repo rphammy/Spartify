@@ -97,7 +97,6 @@ public class ProfileFragment extends Fragment {
 
     private void updateSong() {
         if (recentlyPlayedTracks.size() > 0) {
-            Log.d("recently played track", recentlyPlayedTracks.get(0).getName());
             song = recentlyPlayedTracks.get(0);
         }
     }
