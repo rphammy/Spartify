@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,8 +39,8 @@ public class ProfileFragment extends Fragment {
 
     private ProfileViewModel profileViewModel;
 
-    private static final String CLIENT_ID = "5cf2b16f08d44fb8a6acb81bd1925738";
-    private static final String REDIRECT_URI = "http://com.example.spartify1/callback";
+    private static final String CLIENT_ID = "1b256be8537d49249f3785fd1c05012c";
+    private static final String REDIRECT_URI = "http://com.example.spartify/kyle/callback/";
 
 
     private static final int REQUEST_CODE = 1337;
@@ -52,7 +53,7 @@ public class ProfileFragment extends Fragment {
 
     private Song song;
 
-    private UserService userService;
+    private UserService userService = null;
     private SongService songService;
     private ArrayList<Song> recentlyPlayedTracks;
 
@@ -70,36 +71,43 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-
-
+        Button connectButton = root.findViewById(R.id.connect_button);
+        connectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                authenticateSpotify();
+                displayUserData(root);
+                v.setVisibility(View.GONE);
+            }
+        });
+        if (this.userService != null) displayUserData(root);
         songService = new SongService(getActivity().getApplicationContext());
-
-
-        authenticateSpotify();
         msharedPreferences = this.getActivity().getSharedPreferences("SPOTIFY", 0);
         queue = Volley.newRequestQueue(this.getActivity());
-
-
         SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences("SPOTIFY", 0);
         Log.d("song", sharedPreferences.getString("userid", "No User"));
-
-        getTracks();
-        displayUserData(root);
+        if (msharedPreferences.getBoolean("ConnectionFlag", false) == true) {
+            displayUserData((root));
+            Button connectionButton = root.findViewById(R.id.connect_button);
+            connectionButton.setVisibility(View.GONE);
+        }
+        //        getTracks();
         return root;
     }
 
-    private void getTracks() {
-        songService.getRecentlyPlayedTracks(() -> {
-            recentlyPlayedTracks = songService.getSongs();
-            updateSong();
-        });
-    }
+//    private void getTracks() {
+//        songService.getRecentlyPlayedTracks(() -> {
+//            recentlyPlayedTracks = songService.getSongs();
+//            updateSong();
+//        });
+//    }
 
-    private void updateSong() {
-        if (recentlyPlayedTracks.size() > 0) {
-            song = recentlyPlayedTracks.get(0);
-        }
-    }
+//    private void updateSong() {
+//        if (recentlyPlayedTracks.size() > 0) {
+//            Log.d("recently played track", recentlyPlayedTracks.get(0).getName());
+//            song = recentlyPlayedTracks.get(0);
+//        }
+//    }
 
     private void authenticateSpotify() {
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
@@ -122,6 +130,7 @@ public class ProfileFragment extends Fragment {
                     editor = getActivity().getSharedPreferences("SPOTIFY", 0).edit();
                     editor.putString("token", response.getAccessToken());
                     Log.d( "GOT AUTH TOKEN", response.getAccessToken());
+                    editor.putBoolean("ConnectionFlag", true);
 
                     editor.apply();
                     waitForUserInfo();
@@ -141,11 +150,15 @@ public class ProfileFragment extends Fragment {
 
 
     private void waitForUserInfo() {
-        UserService userService = new UserService(queue, msharedPreferences);
-        userService.get(() -> {
-            User user = userService.getUser();
+        this.userService = new UserService(queue, msharedPreferences);
+        this.userService.get(() -> {
+            User user = this.userService.getUser();
             editor = getActivity().getSharedPreferences("SPOTIFY", 0).edit();
             editor.putString("userid", user.id);
+            editor.putString("display_name", user.display_name);
+            if(user.images.length > 0) {
+                editor.putString("profile_pic_url", user.images[0].url);
+            }
 
             Log.d("GOT USER INFORMATION", user.id);
             // We use commit instead of apply because we need the information stored immediately
@@ -155,25 +168,23 @@ public class ProfileFragment extends Fragment {
     }
 
     private void displayUserData(View view) {
-        UserService userService = new UserService(queue, msharedPreferences);
-        userService.get(() -> {
-            User user = userService.getUser();
+//        this.userService = new UserService(queue, msharedPreferences);
+//        this.userService.get(() -> {
+//            User user = this.userService.getUser();
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("SPOTIFY", 0);
 
             TextView username = view.findViewById(R.id.text_username);
             TextView name = view.findViewById(R.id.text_name);
 
-            name.setText(user.display_name);
-            username.setText(user.id);
+            name.setText(sharedPreferences.getString("display_name", "user"));
+            username.setText(sharedPreferences.getString("userid", "user"));
             ImageView profilePic = view.findViewById(R.id.picture_profile);
-            if(user.images.length > 0) {
-                new DownloadImageTask(profilePic).execute(user.images[0].url);
-            }
-            else {
+            if(sharedPreferences.getString("profile_pic_url", "def").equals("def")) {
                 profilePic.setImageResource(R.drawable.default_profile);
             }
-
-
-        });
+            else {
+                new DownloadImageTask(profilePic).execute(sharedPreferences.getString("profile_pic_url", "def"));
+            }
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {

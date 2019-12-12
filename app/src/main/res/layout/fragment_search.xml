@@ -43,7 +43,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginEnd="125dp"
         android:backgroundTint="@color/spotifyGreen"
-        android:fontFamily="@font/montserrat"
+        android:fontFamily="sans-serif"
         android:hint="Search Spotify..."
         android:imeOptions="actionDone"
         android:inputType="text"
