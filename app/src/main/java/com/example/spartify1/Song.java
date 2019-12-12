@@ -3,14 +3,14 @@ package com.example.spartify1;
 public class Song {
 
     private String id;
-    private String title;
+    private String name;
     private String uri;
     private String artist;
 
     public Song(){}
     
-    public Song(String id, String title, String uri, String artist) {
-        this.title = title;
+    public Song(String id, String name, String uri, String artist) {
+        this.name = name;
         this.id = id;
         this.uri = uri;
         this.artist = artist;
@@ -24,12 +24,12 @@ public class Song {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getUri() {
@@ -49,6 +49,6 @@ public class Song {
     }
     @Override
     public String toString() {
-        return this.title + " by " + this.artist;
+        return this.name + " by " + this.artist;
     }
 }

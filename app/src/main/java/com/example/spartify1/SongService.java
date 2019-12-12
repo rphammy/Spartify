@@ -84,6 +84,7 @@ public class SongService {
                     try {
                         JSONObject tracks = response.getJSONObject("tracks");
                         JSONArray jsonArray = tracks.getJSONArray("items");
+                        Log.d("json", jsonArray.toString(4));
 
                         for (int n = 0; n < jsonArray.length(); n++) {
                             try {

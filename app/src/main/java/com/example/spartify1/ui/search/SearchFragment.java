@@ -89,7 +89,7 @@ public class SearchFragment extends Fragment {
 
     private void addSongToQueue(Song song){
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("title", song.getTitle());
+        dataMap.put("name", song.getName());
         dataMap.put("artist", song.getArtist());
         dataMap.put("uri", song.getUri());
         ref.child("parties").child("-PARTY_ID_" + partyID).push().updateChildren(dataMap);
