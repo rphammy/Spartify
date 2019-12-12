@@ -41,8 +41,8 @@ public class ProfileFragment extends Fragment {
 
     private ProfileViewModel profileViewModel;
 
-    public static final String CLIENT_ID = "082b2bb93cb2472f9dc9f937442f2030";
-    public static final String REDIRECT_URI = "https://com.example.spartify1caroline/callback/";
+    public static final String CLIENT_ID = "5cf2b16f08d44fb8a6acb81bd1925738";
+    public static final String REDIRECT_URI = "http://com.example.spartify1/callback";
 
 
     private static final int REQUEST_CODE = 1337;

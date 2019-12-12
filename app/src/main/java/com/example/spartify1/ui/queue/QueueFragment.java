@@ -17,7 +17,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -78,7 +77,6 @@ public class QueueFragment extends Fragment {
         editor = getActivity().getSharedPreferences("SPOTIFY", 0).edit();
         activeQueue = msharedPreferences.getBoolean("activeQueue", true);
 
-
         if(activeQueue) { //load saved state
             root = inflater.inflate(R.layout.fragment_queue_display, container, false);
             backButton = root.findViewById(R.id.button);
@@ -89,8 +87,14 @@ public class QueueFragment extends Fragment {
                     editor.putBoolean("activeQueue", false);
                     editor.commit();
                     QueueFragment fragment = new QueueFragment();
-                    getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
 
+                    try {
+                        getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
+                    }
+                    catch(NullPointerException e)
+                    {
+                        System.out.print("NullPointerException Caught");
+                    }
                 }
             });
             textView = root.findViewById(R.id.textView);
@@ -160,6 +164,10 @@ public class QueueFragment extends Fragment {
                     textView.setVisibility(View.VISIBLE);
                     editor.putBoolean("activeQueue", true);
                     editor.commit();
+
+
+                    //set listview here
+                    loadQueue();
 
                 }
             };
@@ -255,6 +263,34 @@ public class QueueFragment extends Fragment {
                 });
     }
 
+    private void loadQueue() {
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+
+                    Song song = ds.getValue(Song.class);
+
+                    songQueue.add(song);
+                    Log.d("songqueue", songQueue.toString());
+                    if(getActivity() != null) {
+                        Log.d("songqueue", "hi");
+
+                        ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
+                        if (listView != null) listView.setAdapter(arrayAdapter);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+        ref.child("parties").child("-PARTY_ID_" + partyCode).addListenerForSingleValueEvent(valueEventListener);
+    }
+
     @Override
     public void onActivityCreated(Bundle bundle) {
         super.onActivityCreated(bundle);
@@ -289,16 +325,23 @@ public class QueueFragment extends Fragment {
 
                 Song song = dataSnapshot.getValue(Song.class);
                 songQueue.remove(song);
-                    if(getActivity() != null) {
-                        Log.d("song", "removed");
-                        ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
-                        listView.setAdapter(arrayAdapter);
-                    }
+                if(getActivity() != null) {
+                    Log.d("song", "removed");
+                    ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
+                    listView.setAdapter(arrayAdapter);
+                }
 
                     //refresh
-                    QueueFragment fragment = new QueueFragment();
-                    getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
 
+
+                    Fragment fragment = new Fragment();
+                try {
+                    getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
+                }
+                catch(NullPointerException e)
+                {
+                    System.out.print("NullPointerException Caught");
+                }
             }
 
             @Override
@@ -312,7 +355,6 @@ public class QueueFragment extends Fragment {
             }
         };
         ref.child("parties").child("-PARTY_ID_" + partyCode).addChildEventListener(childEventListener);
-        //ref.child("parties").addChildEventListener(childEventListener);
 
         //when you click a song
         if (listView != null) {
