@@ -27,7 +27,6 @@ import com.example.spartify1.Song;
 import com.example.spartify1.SongService;
 import com.example.spartify1.User;
 import com.example.spartify1.UserService;
-import com.spotify.android.appremote.api.SpotifyAppRemote;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
@@ -39,8 +38,8 @@ public class ProfileFragment extends Fragment {
 
     private ProfileViewModel profileViewModel;
 
-    private static final String CLIENT_ID = "5cf2b16f08d44fb8a6acb81bd1925738";
-    private static final String REDIRECT_URI = "http://com.example.spartify1/callback";
+    public static final String CLIENT_ID = "5cf2b16f08d44fb8a6acb81bd1925738";
+    public static final String REDIRECT_URI = "http://com.example.spartify1/callback";
 
 
     private static final int REQUEST_CODE = 1337;
@@ -132,7 +131,7 @@ public class ProfileFragment extends Fragment {
                     Log.d( "GOT AUTH TOKEN", response.getAccessToken());
                     editor.putBoolean("ConnectionFlag", true);
 
-                    editor.apply();
+                    editor.commit();
                     waitForUserInfo();
                     break;
 
