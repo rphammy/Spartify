@@ -158,12 +158,14 @@ public class QueueFragment extends Fragment {
                 public void onChanged(@Nullable String s) {
                     partyCode = s;
                     editor.putString("partyCode", partyCode);
-                    editText.setVisibility(View.GONE);
-                    goButton.setVisibility(View.GONE);
+                    //editText.setVisibility(View.GONE);
+                    //goButton.setVisibility(View.GONE);
                     textView.setText("Party code: " + partyCode);
-                    textView.setVisibility(View.VISIBLE);
+                    //textView.setVisibility(View.VISIBLE);
                     editor.putBoolean("activeQueue", true);
                     editor.commit();
+                    QueueFragment fragment = new QueueFragment();
+                    getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
 
 
                     //set listview here
