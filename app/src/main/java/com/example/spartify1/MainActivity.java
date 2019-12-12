@@ -1,6 +1,7 @@
 package com.example.spartify1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.example.spartify1.ui.profile.ProfileFragment;
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+        SharedPreferences.Editor editor = this.getSharedPreferences("SPOTIFY", 0).edit();
+        editor.putBoolean("activeQueue", true);
     }
 
     @Override
