@@ -75,7 +75,10 @@ public class QueueFragment extends Fragment {
         TextView textView;
         EditText editText;
         msharedPreferences = getContext().getSharedPreferences("SPOTIFY", 0);
+        editor = getActivity().getSharedPreferences("SPOTIFY", 0).edit();
+        editor.putBoolean("activeQueue", false);
         activeQueue = msharedPreferences.getBoolean("activeQueue", false);
+
 
         if(activeQueue) { //load saved state
             root = inflater.inflate(R.layout.fragment_queue_display, container, false);
@@ -154,14 +157,11 @@ public class QueueFragment extends Fragment {
                     goButton.setVisibility(View.GONE);
                     textView.setText("Party code: " + partyCode);
                     textView.setVisibility(View.VISIBLE);
-
-
-                    //listview updated here
+                    editor.putBoolean("activeQueue", true);
 
                 }
             };
             queueViewModel.getText().observe(this, observer);
-
 
             joinButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -264,13 +264,16 @@ public class QueueFragment extends Fragment {
 
 
 
+
         //add or remove when data is changed
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                //songQueue.clear();
                 Song song = dataSnapshot.getValue(Song.class);
                 songQueue.add(song);
 
+                Log.d("songqueue", songQueue.toString());
                 if(getActivity() != null) {
                     ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
                     if (listView != null) listView.setAdapter(arrayAdapter);
@@ -285,10 +288,8 @@ public class QueueFragment extends Fragment {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                songQueue = new ArrayList<>();
-
-                    Song song = dataSnapshot.getValue(Song.class);
-                    songQueue.remove(song);
+                Song song = dataSnapshot.getValue(Song.class);
+                songQueue.remove(song);
                     if(getActivity() != null) {
                         Log.d("song", "removed");
                         ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
@@ -312,6 +313,7 @@ public class QueueFragment extends Fragment {
             }
         };
         ref.child("parties").child("-PARTY_ID_" + partyCode).addChildEventListener(childEventListener);
+        //ref.child("parties").addChildEventListener(childEventListener);
 
         //when you click a song
         if (listView != null) {
