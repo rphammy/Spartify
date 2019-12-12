@@ -10,6 +10,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,7 +47,6 @@ public class SongService {
                         try {
                             JSONObject object = jsonArray.getJSONObject(n);
                             object = object.optJSONObject("track");
-                            //Log.d("jsom", object.toString(4));
                             Song song = gson.fromJson(object.toString(), Song.class);
                             songs.add(song);
                         } catch (JSONException e) {
@@ -81,14 +82,19 @@ public class SongService {
                 (Request.Method.GET, endpoint, null, response -> {
                     Gson gson = new Gson();
                     try {
-                        JSONObject artists = response.optJSONObject("tracks");
-                        JSONArray jsonArray = artists.optJSONArray("items");
-                        Log.d("json", jsonArray.toString(4));
+                        JSONObject tracks = response.getJSONObject("tracks");
+                        JSONArray jsonArray = tracks.getJSONArray("items");
 
                         for (int n = 0; n < jsonArray.length(); n++) {
                             try {
                                 JSONObject object = jsonArray.getJSONObject(n);
+
+                                JSONArray artistArray = object.getJSONArray("artists");
+                                JSONObject artist = artistArray.getJSONObject(0);
+                                String name = artist.getString("name");
+
                                 Song song = gson.fromJson(object.toString(), Song.class);
+                                song.setArtist(name);
                                 songs.add(song);
 
                             } catch (JSONException e) {

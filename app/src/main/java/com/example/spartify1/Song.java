@@ -5,13 +5,13 @@ public class Song {
     private String id;
     private String name;
     private String uri;
-//    private String artist;
+    private String artist;
 
-    public Song(String id, String name, String uri) {
+    public Song(String id, String name, String uri, String artist) {
         this.name = name;
         this.id = id;
         this.uri = uri;
-//        this.artist = artist;
+        this.artist = artist;
     }
 
     public String getId() {
@@ -38,18 +38,15 @@ public class Song {
         this.uri = uri;
     }
 
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
     @Override
     public String toString() {
-        return this.name;
+        return this.name + " by " + this.artist;
     }
-//
-
-//    public String getArtist() {
-//        return artist;
-//    }
-//
-//    public void setArtist(String artist) {
-//        this.artist = artist;
-//    }
-
 }
