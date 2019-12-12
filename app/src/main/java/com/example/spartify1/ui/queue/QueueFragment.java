@@ -332,18 +332,6 @@ public class QueueFragment extends Fragment {
                     ArrayAdapter<Song> arrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.simplerow, songQueue);
                     listView.setAdapter(arrayAdapter);
                 }
-
-                    //refresh
-
-
-                    Fragment fragment = new Fragment();
-                try {
-                    getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
-                }
-                catch(NullPointerException e)
-                {
-                    System.out.print("NullPointerException Caught");
-                }
             }
 
             @Override
