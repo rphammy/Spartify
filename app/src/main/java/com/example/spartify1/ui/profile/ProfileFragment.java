@@ -41,8 +41,8 @@ public class ProfileFragment extends Fragment {
 
     private ProfileViewModel profileViewModel;
 
-    public static final String CLIENT_ID = "1b256be8537d49249f3785fd1c05012c";
-    public static final String REDIRECT_URI = "http://com.example.spartify/kyle/callback/";
+    public static final String CLIENT_ID = "082b2bb93cb2472f9dc9f937442f2030";
+    public static final String REDIRECT_URI = "http://com.example.spartify1caroline/callback/";
 
 
     private static final int REQUEST_CODE = 1337;
@@ -63,6 +63,7 @@ public class ProfileFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
         profileViewModel =
                 ViewModelProviders.of(this).get(ProfileViewModel.class);
         root = inflater.inflate(R.layout.fragment_profile, container, false);
