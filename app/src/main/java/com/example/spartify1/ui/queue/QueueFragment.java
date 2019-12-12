@@ -9,20 +9,25 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import org.apache.commons.lang3.RandomStringUtils;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.example.spartify1.R;
+import com.example.spartify1.Song;
+import com.google.firebase.database.DatabaseReference;
+
+import java.util.ArrayList;
 import com.example.spartify1.Song;
 import com.example.spartify1.ui.profile.ProfileFragment;
 import com.google.firebase.FirebaseApp;
@@ -58,18 +63,37 @@ public class QueueFragment extends Fragment {
 
     DatabaseReference ref;
 
+    private View root;
+    Button backButton;
+
+    private TextView textView;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         songQueue = new ArrayList<>();
-        View root;
         TextView textView;
+        EditText editText;
         msharedPreferences = getContext().getSharedPreferences("SPOTIFY", 0);
         activeQueue = msharedPreferences.getBoolean("activeQueue", false);
 
         if(activeQueue) { //load saved state
             root = inflater.inflate(R.layout.fragment_queue_display, container, false);
+            backButton = root.findViewById(R.id.button);
+            backButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    editor = getActivity().getSharedPreferences("SPOTIFY", 0).edit();
+                    editor.putBoolean("activeQueue", false);
+                    editor.commit();
+                    QueueFragment fragment = new QueueFragment();
+                    getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
+
+                }
+            });
             textView = root.findViewById(R.id.textView);
+            editText = root.findViewById(R.id.editText);
+            editText.setVisibility(View.GONE);
             partyCode= msharedPreferences.getString("partyCode", "");
             textView.setText("Party code: " + partyCode);
         }
@@ -77,8 +101,26 @@ public class QueueFragment extends Fragment {
         else {
             root = inflater.inflate(R.layout.fragment_queue_welcome, container, false);
             textView = root.findViewById(R.id.text_queue);
+            editText = root.findViewById(R.id.editText);
+            editText.setVisibility(View.GONE);
             Button joinButton = root.findViewById(R.id.button);
             Button hostButton = root.findViewById(R.id.button2);
+
+            backButton = root.findViewById(R.id.backButton);
+            backButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    editor = getActivity().getSharedPreferences("SPOTIFY", 0).edit();
+                    editor.putBoolean("activeQueue", false);
+                    editor.commit();
+                    QueueFragment fragment = new QueueFragment();
+                    getFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, fragment).commit();
+
+                }
+            });
+            backButton.setVisibility(View.GONE);
+            Button goButton = root.findViewById(R.id.go_button);
+            goButton.setVisibility(View.GONE);
 
             //host a party
             partyCode = RandomStringUtils.randomAlphanumeric(7);
@@ -96,11 +138,27 @@ public class QueueFragment extends Fragment {
                     hostButton.setVisibility(View.GONE);
                     joinButton.setVisibility(View.GONE);
                     textView.setText("Party code: " + partyCode);
+                    backButton.setVisibility(View.VISIBLE);
                 }
             });
 
 
             //join a party
+            QueueViewModel queueViewModel= ViewModelProviders.of(this).get(QueueViewModel.class);
+            Observer<String> observer = new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable String s) {
+                    partyCode = s;
+                    editor.putString("partyCode", partyCode);
+                    editText.setVisibility(View.GONE);
+                    goButton.setVisibility(View.GONE);
+                    textView.setText("Party code: " + partyCode);
+                    textView.setVisibility(View.VISIBLE);
+
+                }
+            };
+            queueViewModel.getText().observe(this, observer);
+
             joinButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -108,13 +166,29 @@ public class QueueFragment extends Fragment {
                     textView.setText("Enter party code: ");
                     hostButton.setVisibility(View.GONE);
                     joinButton.setVisibility(View.GONE);
-
+                    editText.setVisibility(View.VISIBLE);
+                    goButton.setVisibility(View.VISIBLE);
 
                     editor = getActivity().getSharedPreferences("SPOTIFY", 0).edit();
-                    editor.putBoolean("host", false);
-                    editor.putBoolean("activeQueue", true);
 
-                    editor.commit();
+                    backButton.setVisibility(View.VISIBLE);
+                    textView.setVisibility(View.GONE);
+
+
+                    goButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            queueViewModel.setText(editText.getText().toString());
+
+                        }
+                    });
+
+                    if(editText.getText().length() == 7) {
+                        editor.putBoolean("host", false);
+                        editor.putBoolean("activeQueue", true);
+                        editor.commit();
+                    }
+
                 }
             });
 
